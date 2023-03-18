@@ -1,7 +1,8 @@
 import {useState,useEffect} from 'react';
 import { ReactNode,useContext as usContextAuth } from "react";
 import { createContext } from "react";
-import { auth } from "../firebase.config";
+import { auth,db } from "../firebase.config";
+import { getDoc, doc } from "firebase/firestore";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword, UserCredential,onAuthStateChanged,signOut, User } from 'firebase/auth';
 
 type UserType = User | null;
@@ -13,6 +14,7 @@ interface AuthContextType {
     signIn: (email: string, password: string) =>  Promise<UserCredential>,
     logging: (email: string, password: string) =>  Promise<UserCredential>,
     logOut: () =>  Promise<void>;
+    getUserRole: (uid: string) => Promise<string | null>;
 };
 
 interface AuthProviderProps{
@@ -30,6 +32,9 @@ export const contextAuth = createContext<AuthContextType>({
     }, // provide a default empty function
     logOut: async () => {
         throw new Error("signOut function not implemented");
+    },
+    getUserRole: async () => { 
+        throw new Error("getUserRole function not implemented");
     },
 });
 
@@ -52,6 +57,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const logOut = () => signOut(auth);
 
+    const getUserRole = async (uid: string): Promise<string | null> => {
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data().rol || null;
+        } else {
+            return null;
+        }
+    };
+
     useEffect(()=>{
         onAuthStateChanged(auth,currentUser => {
             setUser(currentUser);
@@ -60,6 +76,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },[])
 
     return (
-        <contextAuth.Provider value={{ signIn,logging, user, logOut, loading }}>{children}</contextAuth.Provider>
+        <contextAuth.Provider value={{ signIn,logging, user, logOut, loading,getUserRole }}>{children}</contextAuth.Provider>
     )
 }

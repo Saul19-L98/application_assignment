@@ -3,6 +3,7 @@ import {useContextHook} from '../hooks/authContext';
 import { db } from "../firebase.config";
 import {doc,setDoc} from 'firebase/firestore';
 import { v4 as uuidv4 } from "uuid";
+import {useUserCredentialsStore} from '../store/userCredentialsStore'
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -18,6 +19,7 @@ interface UserRegister{
 function Register(){
 
     const navigate = useNavigate();
+    const { setUserCredentials } = useUserCredentialsStore();
 
     const [userToRegister,setUserToRegister] =  useState<UserRegister>({
         email:"",
@@ -28,7 +30,7 @@ function Register(){
         initialDate:""
     });
 
-    const {signIn} = useContextHook();
+    const {signIn,getUserRole} = useContextHook();
     
     const handleOnChange = ({target:{name,value}}: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         console.log(name,value)
@@ -39,14 +41,27 @@ function Register(){
         event.preventDefault();
         try{
             const infoUser = await signIn(userToRegister.email,userToRegister.password);
+            if(infoUser){
+                setUserCredentials(infoUser);
+            }
             const idgenerated = uuidv4();
             const docRefUsers = doc(db,`users/${infoUser.user.uid}`);
             const docRefEmployees = doc(db,`employees/${idgenerated}`);
-            if(docRefUsers){
+            if(docRefUsers && docRefEmployees){
                 setDoc(docRefUsers,{rol:userToRegister.rol,employeeId:idgenerated});
                 setDoc(docRefEmployees,{fullName: userToRegister.fullName,Position: userToRegister.position,startDate:userToRegister.initialDate});
             }
-            navigate("/");
+            else {
+                throw new Error("docRef creation failed");
+            }
+            const userRole = await getUserRole(infoUser.user.uid);
+            if (userRole === "employee") {
+                navigate("/");
+            } else if (userRole === "hrSpecialist") {
+                navigate("/dashboard");
+            } else {
+                throw new Error("Unknown user role");
+            }
             toast.success("User war created succefuly")
         }
         catch(error){

@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import {useContextHook} from '../hooks/authContext';
+import { useUserCredentialsStore } from "../store/userCredentialsStore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +11,7 @@ interface UserLog{
 
 function Logging(){
 
+    const { setUserCredentials } = useUserCredentialsStore();
     const navigate = useNavigate();
 
     const [userToLog,setUserToLog] =  useState<UserLog>({
@@ -17,7 +19,7 @@ function Logging(){
         password:"",
     });
 
-    const {logging} = useContextHook();
+    const {logging,getUserRole } = useContextHook();
     
     const handleOnChange = ({target:{name,value}}: ChangeEvent<HTMLInputElement>) => {
         console.log(name,value)
@@ -27,9 +29,19 @@ function Logging(){
     const handleLog = async (event: FormEvent) => {
         event.preventDefault();
         try{
-            await logging(userToLog.email,userToLog.password);
-            navigate("/");
-            toast.success("Logged succefuly")
+            const userLogIn = await logging(userToLog.email,userToLog.password);
+            if(userLogIn){
+                setUserCredentials(userLogIn);   
+                const userRole = await getUserRole(userLogIn.user.uid);
+                if (userRole === "employee") {
+                    navigate("/");
+                } else if (userRole === "hrSpecialist") {
+                    navigate("/dashboard");
+                } else {
+                    throw new Error("Unknown user role");
+                }
+                toast.success("Logged succefuly")
+            }
         }
         catch(error){
             const errorMessage = (error as Error).message;

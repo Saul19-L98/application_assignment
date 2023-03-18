@@ -1,19 +1,22 @@
 import { useContextHook } from "../hooks/authContext";
 import {ReactNode} from 'react'
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Spinner from "../components/Spinner";
 
+
 interface ProtectedRouteProps{
-    children: ReactNode;
+    isAllowed?: boolean;
+    children?: ReactNode;
 };
 
-function ProtectedRoute({children}:ProtectedRouteProps){
-    const { user,loading} = useContextHook();
 
+function ProtectedRoute({children,isAllowed}:ProtectedRouteProps){
+    const { loading } = useContextHook();
+    console.log(isAllowed)
     if(loading) return <Spinner />;
-    if(!user) return <Navigate to="/sign-up"/>
+    if(!isAllowed) return <Navigate to="/sign-up"/>
 
-    return <>{children}</>
+    return children ? <>{children}</> : <Outlet />
 }
 
 export default ProtectedRoute;
