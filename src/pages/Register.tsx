@@ -1,9 +1,10 @@
 import { ChangeEvent, FormEvent, useState } from "react";
-import {useContextHook} from '../context/authContext';
+import {useContextHook} from '../hooks/authContext';
 import { db } from "../firebase.config";
 import {doc,setDoc} from 'firebase/firestore';
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface UserRegister{
     email:string,
@@ -14,7 +15,9 @@ interface UserRegister{
     initialDate: string,
 }
 
-function SignIn(){
+function Register(){
+
+    const navigate = useNavigate();
 
     const [userToRegister,setUserToRegister] =  useState<UserRegister>({
         email:"",
@@ -43,11 +46,13 @@ function SignIn(){
                 setDoc(docRefUsers,{rol:userToRegister.rol,employeeId:idgenerated});
                 setDoc(docRefEmployees,{fullName: userToRegister.fullName,Position: userToRegister.position,startDate:userToRegister.initialDate});
             }
+            navigate("/");
             toast.success("User war created succefuly")
         }
         catch(error){
-            toast.error(`${error}`)
-            throw new Error(`Something went wrong: ${error}`)
+            const errorMessage = (error as Error).message;
+            toast.error(`${errorMessage}`)
+            throw new Error(`Something went wrong: ${errorMessage}`)
         }
     }
 
@@ -88,4 +93,4 @@ function SignIn(){
     )
 }
 
-export default SignIn;
+export default Register;

@@ -1,12 +1,23 @@
-import { useContextHook} from "../context/authContext";
+import { useContextHook} from "../hooks/authContext";
 
 
 function Home(){
-    const {user} = useContextHook();
-    console.log(user)
+
+    const {user,logOut} = useContextHook();
+    console.log(user!);
+
+    const handleLogOut = async () => {
+        await logOut();
+    }
+
     return(
         <div>
-            <h1>Hello from Home</h1>
+            <h1>{user!.email}</h1>
+            <div>
+                <button className="btn btn-primary" onClick={handleLogOut}>
+                    Sign Out
+                </button>
+            </div>
         </div>
     )
 }
