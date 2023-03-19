@@ -44,12 +44,9 @@ function Register(){
             if(infoUser){
                 setUserCredentials(infoUser);
             }
-            const idgenerated = uuidv4();
             const docRefUsers = doc(db,`users/${infoUser.user.uid}`);
-            const docRefEmployees = doc(db,`employees/${idgenerated}`);
-            if(docRefUsers && docRefEmployees){
-                setDoc(docRefUsers,{rol:userToRegister.rol,employeeId:idgenerated});
-                setDoc(docRefEmployees,{fullName: userToRegister.fullName,Position: userToRegister.position,startDate:userToRegister.initialDate});
+            if(docRefUsers ){
+                setDoc(docRefUsers,{rol:userToRegister.rol,fullName: userToRegister.fullName,position: userToRegister.position, initailDate:userToRegister.initialDate});
             }
             else {
                 throw new Error("docRef creation failed");
@@ -62,7 +59,7 @@ function Register(){
             } else {
                 throw new Error("Unknown user role");
             }
-            toast.success("User war created succefuly")
+            toast.success("User created succefuly")
         }
         catch(error){
             const errorMessage = (error as Error).message;
