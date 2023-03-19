@@ -1,5 +1,6 @@
 import { useContextHook} from "../hooks/authContext";
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
+import ModalForm from "../components/ModalForm";
 import Table from "../components/Table";
 
 function DashBoard(){
@@ -16,6 +17,11 @@ function DashBoard(){
                 <button className="btn btn-primary" onClick={handleLogOut}>
                     Sign Out
                 </button>
+                <label htmlFor="my-modal" className="btn btn-primary">Create Application</label>
+                <input type="checkbox" id="my-modal" className="modal-toggle" />
+                <div className="modal">
+                    <ModalForm />
+                </div>
             </div>
             <>
                 <Table />
