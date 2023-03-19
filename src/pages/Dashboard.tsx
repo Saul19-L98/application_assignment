@@ -1,10 +1,13 @@
 import { useContextHook} from "../hooks/authContext";
+import { useUserCredentialsStore } from "../store/userCredentialsStore";
 import Table from "../components/Table";
 
 function DashBoard(){
+    const {setUserCredentials} = useUserCredentialsStore();
     const {logOut} = useContextHook();;
     const handleLogOut = async () => {
         await logOut();
+        setUserCredentials(null);
     }
     return(
         <div>

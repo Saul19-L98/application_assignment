@@ -8,10 +8,11 @@ import DashBoard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import Logging from "./pages/Loggin";
 import NotFound from "./pages/NotFound";
+import Spinner from "./components/Spinner";
 
 function App() {
 
-  const { user,getUserRole} = useContextHook();
+  const { getUserRole} = useContextHook();
 
     const {userCredentials} = useUserCredentialsStore();
     
@@ -21,7 +22,6 @@ function App() {
       const fetchUserRole = async () => {
           if (userCredentials && userCredentials.user) {
               const fetchedRole = await getUserRole(userCredentials.user.uid);
-              console.log("App:" + !!user && fetchedRole === "employee");
               setRoleAssigned(fetchedRole);
           }
       };
@@ -33,16 +33,16 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<ProtectedRoute isAllowed={!!user} />}>
+          <Route path="/" element={<ProtectedRoute isAllowed={!!userCredentials?.user} />}>
             <Route path="/" element={
-              <ProtectedRoute isAllowed={!!user && roleAssigned === "employee"}>
+              <ProtectedRoute isAllowed={!!userCredentials?.user && roleAssigned === "employee"}>
                 <Home />
               </ProtectedRoute>
             }/>
           </Route>
-          <Route path="/dashboard" element={<ProtectedRoute isAllowed={!!user} />}>
+          <Route path="/dashboard" element={<ProtectedRoute isAllowed={!!userCredentials?.user} />}>
             <Route path="/dashboard" element={
-              <ProtectedRoute isAllowed={!!user && roleAssigned === "hrSpecialist"}>
+              <ProtectedRoute isAllowed={!!userCredentials?.user && roleAssigned === "hrSpecialist"}>
                 <DashBoard />
               </ProtectedRoute>
             }/>

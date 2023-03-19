@@ -1,19 +1,24 @@
 import { useContextHook} from "../hooks/authContext";
+import { useNavigate } from "react-router-dom";
+import { useUserCredentialsStore } from "../store/userCredentialsStore";
 
 
 function Home(){
 
-    const {user,logOut} = useContextHook();
-    console.log(user!);
-
+    const navigate = useNavigate();
+    const {userCredentials,setUserCredentials} = useUserCredentialsStore();
+    const {logOut} = useContextHook();
+    console.log(`What is this Home: ${userCredentials?.user}`);
+    console.log(userCredentials?.user)
     const handleLogOut = async () => {
         await logOut();
+        setUserCredentials(null);
     }
 
     return(
         <div>
             <h1>Hello from DashBoard (Employee)</h1>
-            <h1>{user!.email}</h1>
+            <h1>{userCredentials?.user!.email}</h1>
             <div>
                 <button className="btn btn-primary" onClick={handleLogOut}>
                     Sign Out
