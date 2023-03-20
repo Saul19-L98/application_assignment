@@ -1,7 +1,11 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState,useEffect, ChangeEvent, FormEvent } from 'react';
 import {useForm, SubmitHandler} from 'react-hook-form';
+import { v4 as uuidv4 } from "uuid";
+import { db } from '../firebase.config';
+import {doc,collection,getDocs,DocumentData, setDoc} from 'firebase/firestore';
 
 interface ApplicationType {
+    employeeId:string;
     medicalUnit: string;
     startDate: string;
     endDate: string;
@@ -10,22 +14,44 @@ interface ApplicationType {
     coverageDays: number;
 }
 
+interface EmployeeRequest{
+    fullName:string,
+    position:string,
+    initialDate:string,
+}
+
 function ModalForm(){
     const initialFormData: ApplicationType = {
-        medicalUnit: '',
-        startDate: '',
-        endDate: '',
-        doctorName: '',
-        medicalDiagnostic: '',
+        employeeId:"",
+        medicalUnit: "",
+        startDate: "",
+        endDate: "",
+        doctorName: "",
+        medicalDiagnostic: "",
         coverageDays: 0,
     };
     const [formData, setFormData] = useState<ApplicationType>(initialFormData);
 
     const { register, reset, formState:{errors}, handleSubmit } = useForm<ApplicationType>();
 
+    const [employees, setEmployees] = useState<DocumentData[] >([]);
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = event.target;
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            const employeesRef = collection(db,'employees');
+            const employeeData = await getDocs(employeesRef);
+            const newEmployees: DocumentData[] = [];
+            employeeData.forEach((doc) => {
+                newEmployees.push({...doc.data(),employeeId:doc.id});
+            });
+            setEmployees([...newEmployees]);
+            console.log(employees)
+        };
+
+        fetchEmployees();
+    }, []);
+
+    const handleChange = ({target:{name,value}}: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData((prevFormData) => ({
             ...prevFormData,
             [name]: value,
@@ -38,11 +64,24 @@ function ModalForm(){
         const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
         return differenceInDays;
     };
-    const handleSubmitAction = (event: FormEvent) => {
+    const handleSubmitAction = async (event: FormEvent) => {
         event.preventDefault();
         const coverageDays = calculateCoverageDays();
-        console.log('Form data:', { ...formData, coverageDays });
-        // Handle form submission logic here
+        setFormData({ ...formData, coverageDays });
+        const appIdGenerated = uuidv4();
+        console.log('Form data:', formData);
+        const docRefapplication = doc(db,`applications/${appIdGenerated}`);
+        if(docRefapplication){
+            await setDoc(docRefapplication,{
+                employeeId: formData.employeeId,
+                medicalUnit: formData.medicalUnit,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                doctorName: formData.doctorName,
+                medicalDiagnostic: formData.medicalDiagnostic,
+                coverageDays: coverageDays,
+            })
+        }
 
         const modalCheckbox = document.getElementById('my-modal') as HTMLInputElement;
         if (modalCheckbox) {
@@ -56,7 +95,22 @@ function ModalForm(){
             </div>
             <form onSubmit={handleSubmitAction} className="mt-4 mb-4">
                 <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="medicalUnit" className="block text-gray-700 text-sm font-bold mb-2">Medical Unit</label>
+                    <div className='mb-4'>
+                        <select
+                            defaultValue={"DEFAULT"}
+                            name="employeeId"
+                            onChange={handleChange}
+                            className="select select-info w-full max-w-xs"
+                        >
+                            <option value="DEFAULT" disabled>Select Employee</option>
+                            {employees.map((employee, index) => (
+                                <option key={index} value={employee.employeeId}>
+                                    {employee.fullName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <label htmlFor="medicalUnit" className="block text-whie text-xl font-bold mb-2">Medical Unit</label>
                     <div className="flex items-center">
                         <input
                         type="radio"
@@ -79,7 +133,7 @@ function ModalForm(){
                     </div>
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="startDate" className="block text-gray-700 text-sm font-bold mb-2">Start Date</label>
+                    <label htmlFor="startDate" className="block text-whie text-xl font-bold mb-2">Start Date</label>
                     <input
                         type="date"
                         name="startDate"
@@ -89,7 +143,7 @@ function ModalForm(){
                     />
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="endDate" className="block text-gray-700 text-sm font-bold mb-2">End Date</label>
+                    <label htmlFor="endDate" className="block text-whie text-xl font-bold mb-2">End Date</label>
                     <input
                         type="date"
                         name="endDate"
@@ -99,7 +153,7 @@ function ModalForm(){
                     />
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="doctorName" className="block text-gray-700 text-sm font-bold mb-2">Doctor Name</label>
+                    <label htmlFor="doctorName" className="block text-whie text-xl font-bold mb-2">Doctor Name</label>
                     <input
                         type="text"
                         name="doctorName"
@@ -109,7 +163,7 @@ function ModalForm(){
                     />
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="medicalDiagnostic" className="block text-gray-700 text-sm font-bold mb-2">Medical Diagnostic</label>
+                    <label htmlFor="medicalDiagnostic" className="block text-whie text-xl font-bold mb-2">Medical Diagnostic</label>
                     <textarea
                         name="medicalDiagnostic"
                         value={formData.medicalDiagnostic}

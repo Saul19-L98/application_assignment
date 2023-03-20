@@ -48,8 +48,8 @@ function Register(){
             const docRefUser = doc(db,`users/${infoUser.user.uid}`);
             const docRefEmployee = doc(db,`employees/${idgenerated}`);
             if(docRefUser && docRefEmployee){
-                setDoc(docRefUser,{rol:userToRegister.rol,employeeId:idgenerated});
-                setDoc(docRefEmployee,{fullName:userToRegister.fullName,position:userToRegister.position,initialDate:userToRegister.initialDate});
+                await setDoc(docRefUser,{rol:userToRegister.rol,employeeId:idgenerated});
+                await setDoc(docRefEmployee,{fullName:userToRegister.fullName,position:userToRegister.position,initialDate:userToRegister.initialDate});
             }
             else {
                 throw new Error("docRef creation failed");
