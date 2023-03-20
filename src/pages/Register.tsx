@@ -44,9 +44,12 @@ function Register(){
             if(infoUser){
                 setUserCredentials(infoUser);
             }
-            const docRefUsers = doc(db,`users/${infoUser.user.uid}`);
-            if(docRefUsers ){
-                setDoc(docRefUsers,{rol:userToRegister.rol,fullName: userToRegister.fullName,position: userToRegister.position, initailDate:userToRegister.initialDate});
+            const idgenerated = uuidv4();
+            const docRefUser = doc(db,`users/${infoUser.user.uid}`);
+            const docRefEmployee = doc(db,`employees/${idgenerated}`);
+            if(docRefUser && docRefEmployee){
+                setDoc(docRefUser,{rol:userToRegister.rol,employeeId:idgenerated});
+                setDoc(docRefEmployee,{fullName:userToRegister.fullName,position:userToRegister.position,initialDate:userToRegister.initialDate});
             }
             else {
                 throw new Error("docRef creation failed");

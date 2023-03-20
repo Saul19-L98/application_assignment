@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
+import {useForm, SubmitHandler} from 'react-hook-form';
 
-interface FormData {
+interface ApplicationType {
     medicalUnit: string;
     startDate: string;
     endDate: string;
@@ -9,17 +10,19 @@ interface FormData {
     coverageDays: number;
 }
 
-const initialFormData: FormData = {
-    medicalUnit: '',
-    startDate: '',
-    endDate: '',
-    doctorName: '',
-    medicalDiagnostic: '',
-    coverageDays: 0,
-};
-
 function ModalForm(){
-    const [formData, setFormData] = useState<FormData>(initialFormData);
+    const initialFormData: ApplicationType = {
+        medicalUnit: '',
+        startDate: '',
+        endDate: '',
+        doctorName: '',
+        medicalDiagnostic: '',
+        coverageDays: 0,
+    };
+    const [formData, setFormData] = useState<ApplicationType>(initialFormData);
+
+    const { register, reset, formState:{errors}, handleSubmit } = useForm<ApplicationType>();
+
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
@@ -35,7 +38,7 @@ function ModalForm(){
         const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
         return differenceInDays;
     };
-    const handleSubmit = (event: FormEvent) => {
+    const handleSubmitAction = (event: FormEvent) => {
         event.preventDefault();
         const coverageDays = calculateCoverageDays();
         console.log('Form data:', { ...formData, coverageDays });
@@ -51,7 +54,7 @@ function ModalForm(){
             <div className="modal-action">
                 <label htmlFor="my-modal" className="btn">Yay!</label>
             </div>
-            <form onSubmit={handleSubmit} className="mt-4 mb-4">
+            <form onSubmit={handleSubmitAction} className="mt-4 mb-4">
                 <div className="mb-4 flex flex-col justify-center">
                     <label htmlFor="medicalUnit" className="block text-gray-700 text-sm font-bold mb-2">Medical Unit</label>
                     <div className="flex items-center">

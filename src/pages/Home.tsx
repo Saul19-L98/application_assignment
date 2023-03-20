@@ -4,8 +4,6 @@ import { useUserCredentialsStore } from "../store/userCredentialsStore";
 
 
 function Home(){
-
-    const navigate = useNavigate();
     const {userCredentials,setUserCredentials} = useUserCredentialsStore();
     const {logOut} = useContextHook();
     console.log(`What is this Home: ${userCredentials?.user}`);
