@@ -28,6 +28,7 @@ interface UserCredentialsState {
     setUserCredentials: (credentials: UserCredential | null) => void;
     setEmployees: (employees: EmployeesData[] | null) => void;
     setApplications: (applications: ApplicationData[] | null) => void;
+    removeApplication: (applicationId: string) => void;
 }
 
 export const useUserCredentialsStore = create<UserCredentialsState>((set) => ({
@@ -37,4 +38,10 @@ export const useUserCredentialsStore = create<UserCredentialsState>((set) => ({
     setUserCredentials: (credentials) => set({ userCredentials: credentials }),
     setEmployees: (employees) => set({ employees: employees }),
     setApplications: (applications) => set({ applications: applications }),
+    removeApplication: (applicationId) =>
+    set((state) => ({
+        applications: state.applications!.filter(
+            (application) => application.applicationId !== applicationId
+        ),
+    })),
 }));

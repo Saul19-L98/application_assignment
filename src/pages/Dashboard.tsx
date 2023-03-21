@@ -6,13 +6,7 @@ import { useApplications, useEmployees } from '../hooks/queryHook';
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
 import ModalForm from "../components/ModalForm";
 import Spinner from "../components/Spinner";
-
-interface EmployeesData{
-    employeeId:string;
-    fullName:string;
-    position:string;
-    initialDate:string;
-}
+import Table from "../components/Table";
 
 function DashBoard(){
     const {setUserCredentials, employees,applications} = useUserCredentialsStore();
@@ -22,26 +16,8 @@ function DashBoard(){
     const { data: applicationsData, isLoading: isApplicationsLoading, isError: isApplicationsError, error: applicationsError } = useApplications();
 
     // Use the useEmployees hook
-    const { data: employeesData, isLoading: isEmployeesLoading, isError: isEmployeesError, error: employeesError } = useEmployees();;
+    const { data: employeesData, isLoading: isEmployeesLoading, isError: isEmployeesError, error: employeesError } = useEmployees();
 
-    // const fetchEmployees = async () => {
-    //     const employeesRef = collection(db, 'employees');
-    //     const employeesDocs = await getDocs(employeesRef);
-    //     const employeesData: DocumentData[] = [];
-    //     employeesDocs.forEach((doc) => {
-    //         employeesData.push({ ...doc.data(), employeeId: doc.id });
-    //     });
-    //     setEmployees(employeesData as EmployeesData[]);
-    // };
-
-    const getEmployeeName = (employeeId: string) => {
-        const employee = employees?.find((e) => e.employeeId === employeeId);
-        return employee ? employee.fullName : "Unknown";
-    };
-
-    // useEffect(() => {
-    //     fetchEmployees();
-    // }, []);
 
     const handleLogOut = async () => {
         await logOut();
@@ -71,13 +47,7 @@ function DashBoard(){
                 </div>
             </div>
             <div>
-                {/* Render your applications data */}
-                {applications?.map((application) => (
-                    <div key={application.applicationId}>
-                        {/* {Show the neames of the users} */}
-                        {getEmployeeName(application.employeeId)}
-                    </div>
-                ))}
+                <Table />
             </div>
         </div>
     )
