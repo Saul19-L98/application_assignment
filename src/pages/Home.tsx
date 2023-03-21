@@ -1,7 +1,5 @@
 import { useContextHook} from "../hooks/authContext";
-import { useNavigate } from "react-router-dom";
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
-
 
 function Home(){
     const {userCredentials,setUserCredentials} = useUserCredentialsStore();

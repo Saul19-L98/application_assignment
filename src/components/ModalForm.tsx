@@ -1,8 +1,9 @@
-import React, { useState,useEffect, ChangeEvent, FormEvent } from 'react';
-import {useForm, SubmitHandler} from 'react-hook-form';
+import {useForm, SubmitHandler,useWatch } from 'react-hook-form';
+import { useUserCredentialsStore } from '../store/userCredentialsStore';
 import { v4 as uuidv4 } from "uuid";
 import { db } from '../firebase.config';
-import {doc,collection,getDocs,DocumentData, setDoc} from 'firebase/firestore';
+import {doc, setDoc,} from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 interface ApplicationType {
     employeeId:string;
@@ -12,12 +13,6 @@ interface ApplicationType {
     doctorName: string;
     medicalDiagnostic: string;
     coverageDays: number;
-}
-
-interface EmployeeRequest{
-    fullName:string,
-    position:string,
-    initialDate:string,
 }
 
 function ModalForm(){
@@ -30,146 +25,147 @@ function ModalForm(){
         medicalDiagnostic: "",
         coverageDays: 0,
     };
-    const [formData, setFormData] = useState<ApplicationType>(initialFormData);
 
-    const { register, reset, formState:{errors}, handleSubmit } = useForm<ApplicationType>();
+    const { employees } = useUserCredentialsStore();
 
-    const [employees, setEmployees] = useState<DocumentData[] >([]);
+    const { register,reset,control ,formState:{errors}, handleSubmit } = useForm<ApplicationType>({defaultValues:initialFormData});
 
-    useEffect(() => {
-        const fetchEmployees = async () => {
-            const employeesRef = collection(db,'employees');
-            const employeeData = await getDocs(employeesRef);
-            const newEmployees: DocumentData[] = [];
-            employeeData.forEach((doc) => {
-                newEmployees.push({...doc.data(),employeeId:doc.id});
-            });
-            setEmployees([...newEmployees]);
-            console.log(employees)
-        };
+    const startDate = useWatch({ control, name: 'startDate' });
+    const endDate = useWatch({ control, name: 'endDate' });
 
-        fetchEmployees();
-    }, []);
+    const handleReset = () => {
+        reset();
+    }
 
-    const handleChange = ({target:{name,value}}: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: value,
-        }));
-    };
-    const calculateCoverageDays = () => {
-        const startDate = new Date(formData.startDate);
-        const endDate = new Date(formData.endDate);
-        const differenceInMilliseconds = endDate.getTime() - startDate.getTime();
+    const calculateCoverageDays = (startDate: string, endDate: string) => {
+        console.log(startDate,endDate)
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const differenceInMilliseconds = end.getTime() - start.getTime();
         const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
         return differenceInDays;
     };
-    const handleSubmitAction = async (event: FormEvent) => {
-        event.preventDefault();
-        const coverageDays = calculateCoverageDays();
-        setFormData({ ...formData, coverageDays });
-        const appIdGenerated = uuidv4();
-        console.log('Form data:', formData);
-        const docRefapplication = doc(db,`applications/${appIdGenerated}`);
-        if(docRefapplication){
-            await setDoc(docRefapplication,{
-                employeeId: formData.employeeId,
-                medicalUnit: formData.medicalUnit,
-                startDate: formData.startDate,
-                endDate: formData.endDate,
-                doctorName: formData.doctorName,
-                medicalDiagnostic: formData.medicalDiagnostic,
-                coverageDays: coverageDays,
-            })
-        }
+    const handleSubmitAction: SubmitHandler<ApplicationType> = async (data:ApplicationType) => {
+        try{
+            const modalCheckbox = document.getElementById('my-modal') as HTMLInputElement;
+            const coverageDays = calculateCoverageDays(data.startDate,data.endDate);
+            const appIdGenerated = uuidv4();
+            const docRefapplication = doc(db,`applications/${appIdGenerated}`);
+            const employeeFullName = employees?.find(employee => employee.employeeId === data.employeeId)?.fullName;
 
-        const modalCheckbox = document.getElementById('my-modal') as HTMLInputElement;
-        if (modalCheckbox) {
-            modalCheckbox.checked = false;
+            if(docRefapplication){
+                await setDoc(docRefapplication,{
+                    employeeId: data.employeeId,
+                    medicalUnit: data.medicalUnit,
+                    startDate: data.startDate,
+                    endDate: data.endDate,
+                    doctorName: data.doctorName,
+                    medicalDiagnostic: data.medicalDiagnostic,
+                    coverageDays: coverageDays,
+                })
+            }else{
+                throw new Error("Error while sending the data.")
+            }
+            if (modalCheckbox) {
+                modalCheckbox.checked = false;
+            }
+            handleReset();
+            toast.success(`Application created for: ${employeeFullName}`);
+        }catch(error){
+            toast.error("Something when wrong! 😯");
+            console.error(`${error}`);
         }
     };
     return(
         <div className="modal-box">
-            <div className="modal-action">
-                <label htmlFor="my-modal" className="btn">Yay!</label>
+            <div className="modal-action" onClick={handleReset}>
+                <label htmlFor="my-modal"className="btn">Yay!</label>
             </div>
-            <form onSubmit={handleSubmitAction} className="mt-4 mb-4">
+            <form onSubmit={handleSubmit(handleSubmitAction)} className="mt-4 mb-4">
                 <div className="mb-4 flex flex-col justify-center">
                     <div className='mb-4'>
+                    <label htmlFor="medicalUnit" className="block text-whie text-xl font-bold mb-2">Select Employee</label>
                         <select
-                            defaultValue={"DEFAULT"}
-                            name="employeeId"
-                            onChange={handleChange}
                             className="select select-info w-full max-w-xs"
+                            id="employeeId"
+                            {...register("employeeId",{required:true})}
                         >
-                            <option value="DEFAULT" disabled>Select Employee</option>
-                            {employees.map((employee, index) => (
+                            {employees?.map((employee, index) => (
                                 <option key={index} value={employee.employeeId}>
                                     {employee.fullName}
                                 </option>
                             ))}
                         </select>
+                        {errors.employeeId?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                     </div>
                     <label htmlFor="medicalUnit" className="block text-whie text-xl font-bold mb-2">Medical Unit</label>
                     <div className="flex items-center">
                         <input
                         type="radio"
-                        name="medicalUnit"
                         value="isss"
-                        checked={formData.medicalUnit === 'isss'}
-                        onChange={handleChange}
+                        // onChange={handleChange}
                         className="checkbox checkbox-secondary"
+                        {...register("medicalUnit",{required:true})}
                         />
                         <label htmlFor="isss" className="mr-4">ISSS</label>
                         <input
                         type="radio"
-                        name="medicalUnit"
                         value="minsal"
-                        checked={formData.medicalUnit === 'minsal'}
-                        onChange={handleChange}
+                        // onChange={handleChange}
                         className="checkbox checkbox-secondary"
+                        {...register("medicalUnit",{required:true})}
                         />
-                        <label htmlFor="minsal">MINSAL</label>
+                        <label htmlFor="minsal" className="mr-4">MINSAL</label>
+                        {errors.medicalUnit?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                     </div>
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
                     <label htmlFor="startDate" className="block text-whie text-xl font-bold mb-2">Start Date</label>
                     <input
                         type="date"
-                        name="startDate"
-                        value={formData.startDate}
-                        onChange={handleChange}
+                        id="startDate"
                         className="input input-bordered input-secondary"
+                        {...register("startDate",{required:true})}
                     />
+                    {errors.startDate?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
                     <label htmlFor="endDate" className="block text-whie text-xl font-bold mb-2">End Date</label>
                     <input
                         type="date"
-                        name="endDate"
-                        value={formData.endDate}
-                        onChange={handleChange}
+                        id="endDate"
                         className="input input-bordered input-secondary"
+                        {...register("endDate",{required:true,validate: {
+                            startDateLessThanEndDate: (value) => new Date(startDate) < new Date(value),
+                        },})}
                     />
+                    {errors.endDate?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
+                    {errors.endDate?.type === 'startDateLessThanEndDate' && (
+                    <span className="text-red-500 text-xs italic">Start date must be less than end date</span>
+                    )}
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
                     <label htmlFor="doctorName" className="block text-whie text-xl font-bold mb-2">Doctor Name</label>
                     <input
                         type="text"
-                        name="doctorName"
-                        value={formData.doctorName}
-                        onChange={handleChange}
+                        id="doctorName"
                         className="input input-bordered input-secondary"
+                        {...register("doctorName", {
+                            required: true,
+                        })}
                     />
+                    {errors.medicalDiagnostic?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="medicalDiagnostic" className="block text-whie text-xl font-bold mb-2">Medical Diagnostic</label>
+                    <label htmlFor="medicalDiagnostic" className="block text-white text-xl font-bold mb-2">Medical Diagnostic</label>
                     <textarea
-                        name="medicalDiagnostic"
-                        value={formData.medicalDiagnostic}
-                        onChange={handleChange}
-                        className="textarea textarea-secondary"
-                    ></textarea>
+                    className='textarea textarea-secondary'
+                    id="description"
+                        {...register("medicalDiagnostic", {
+                            required: true,
+                        })}
+                    />
+                    {errors.medicalDiagnostic?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
                     <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
