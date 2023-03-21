@@ -2,7 +2,7 @@ import {useEffect} from "react";
 import { db } from "../firebase.config";
 import {collection,getDocs,DocumentData} from 'firebase/firestore';
 import { useContextHook} from "../hooks/authContext";
-import { useApplications } from '../hooks/queryHook';
+import { useApplications, useEmployees } from '../hooks/queryHook';
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
 import ModalForm from "../components/ModalForm";
 import Spinner from "../components/Spinner";
@@ -15,30 +15,33 @@ interface EmployeesData{
 }
 
 function DashBoard(){
-    const {setUserCredentials,setEmployees} = useUserCredentialsStore();
+    const {setUserCredentials, employees,applications} = useUserCredentialsStore();
     const {logOut} = useContextHook();
 
-    const { isLoading, isError } = useApplications();
-    const { applications,employees } = useUserCredentialsStore();
+     // Use the useApplications hook
+    const { data: applicationsData, isLoading: isApplicationsLoading, isError: isApplicationsError, error: applicationsError } = useApplications();
 
-    const fetchEmployees = async () => {
-        const employeesRef = collection(db, 'employees');
-        const employeesDocs = await getDocs(employeesRef);
-        const employeesData: DocumentData[] = [];
-        employeesDocs.forEach((doc) => {
-            employeesData.push({ ...doc.data(), employeeId: doc.id });
-        });
-        setEmployees(employeesData as EmployeesData[]);
-    };
+    // Use the useEmployees hook
+    const { data: employeesData, isLoading: isEmployeesLoading, isError: isEmployeesError, error: employeesError } = useEmployees();;
+
+    // const fetchEmployees = async () => {
+    //     const employeesRef = collection(db, 'employees');
+    //     const employeesDocs = await getDocs(employeesRef);
+    //     const employeesData: DocumentData[] = [];
+    //     employeesDocs.forEach((doc) => {
+    //         employeesData.push({ ...doc.data(), employeeId: doc.id });
+    //     });
+    //     setEmployees(employeesData as EmployeesData[]);
+    // };
 
     const getEmployeeName = (employeeId: string) => {
         const employee = employees?.find((e) => e.employeeId === employeeId);
         return employee ? employee.fullName : "Unknown";
     };
 
-    useEffect(() => {
-        fetchEmployees();
-    }, []);
+    // useEffect(() => {
+    //     fetchEmployees();
+    // }, []);
 
     const handleLogOut = async () => {
         await logOut();
@@ -46,11 +49,11 @@ function DashBoard(){
     }
 
 
-    if (isLoading) {
+    if (isApplicationsLoading && isEmployeesLoading) {
         return <Spinner />;
     }
     
-    if (isError) {
+    if (isApplicationsError && isEmployeesError) {
     return <Spinner />;
     }
 

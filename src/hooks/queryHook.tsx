@@ -4,8 +4,6 @@ import { useUserCredentialsStore } from '../store/userCredentialsStore';
 import { collection, getDocs, DocumentData } from 'firebase/firestore';
 
 interface ApplicationData {
-    // Define the fields you expect in the "applications" collection
-    // Add more fields as needed
     applicationId:string;
     employeeId: string;
     medicalUnit: string;
@@ -16,24 +14,46 @@ interface ApplicationData {
     coverageDays: number;
 }
 
+interface EmployeesData{
+    employeeId:string;
+    fullName:string;
+    position:string;
+    initialDate:string;
+}
 
-async function fetchApplications(): Promise<DocumentData[]> {
+const fetchApplications = async (): Promise<DocumentData[]> => {
     const applicationsRef = collection(db, 'applications');
-    const applicationsSnapshot = await getDocs(applicationsRef);
-    const applications: DocumentData[] = applicationsSnapshot.docs.map((doc) => ({
+    const applicationsDocs = await getDocs(applicationsRef);
+    const applications: DocumentData[] = applicationsDocs.docs.map((doc) => ({
         ...doc.data(),
         applicationId: doc.id,
-    })) as DocumentData[];
+    }));
     return applications;
 }
 
-export function useApplications() {
-    
-    const {setApplications} = useUserCredentialsStore();
+const fetchEmployees = async (): Promise<DocumentData[]> => {
+    const employeesRef = collection(db, 'employees');
+    const employeesDocs = await getDocs(employeesRef);
+    const employeesData: DocumentData[] = employeesDocs.docs.map((doc) => ({
+        ...doc.data(), employeeId: doc.id 
+    }));
+    return employeesData;
+};
 
-        return useQuery<DocumentData[], Error>('applications', fetchApplications, {
+export function useApplications() {
+    const {setApplications} = useUserCredentialsStore();
+    return useQuery<DocumentData[], Error>('applications', fetchApplications, {
         onSuccess: (data) => {
             setApplications(data as ApplicationData[]);
+        },
+    });
+};
+
+export function useEmployees(){
+    const {setEmployees} = useUserCredentialsStore();
+    return useQuery<DocumentData[], Error>('employees', fetchEmployees, {
+        onSuccess: (data) => {
+            setEmployees(data as EmployeesData[]);
         },
     });
 }
