@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import TableRow from "./TableRow";
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
-import Spinner from './Spinner';
 
 function Table() {
 
@@ -11,7 +10,6 @@ function Table() {
     const [searchTerm, setSearchTerm] = useState("");
     const [startDateFilter, setStartDateFilter] = useState("");
     const [endDateFilter, setEndDateFilter] = useState("");
-    const [submitted, setSubmitted] = useState(false);
     // Add a state to manage the current page
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
@@ -22,6 +20,7 @@ function Table() {
         setEndDateFilter("");
     };
 
+    // Get Employee's name
     const getEmployeeName = (employeeId: string) => {
         const employee = employees?.find((e) => e.employeeId === employeeId);
         return employee ? employee.fullName : "Unknown";

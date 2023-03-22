@@ -1,6 +1,3 @@
-import {useEffect} from "react";
-import { db } from "../firebase.config";
-import {collection,getDocs,DocumentData} from 'firebase/firestore';
 import { useContextHook} from "../hooks/authContext";
 import { useApplications, useEmployees } from '../hooks/queryHook';
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
@@ -9,8 +6,14 @@ import Spinner from "../components/Spinner";
 import Table from "../components/Table";
 
 function DashBoard(){
-    const {setUserCredentials, employees,applications} = useUserCredentialsStore();
+    const {setUserCredentials,userData, employees} = useUserCredentialsStore();
     const {logOut} = useContextHook();
+
+    // Get Employee's name
+    const getEmployeeName = (employeeId: string) => {
+        const employee = employees?.find((e) => e.employeeId === employeeId);
+        return employee ? employee.fullName : "Unknown";
+    };
 
      // Use the useApplications hook
     const { data: applicationsData, isLoading: isApplicationsLoading, isError: isApplicationsError, error: applicationsError } = useApplications();
@@ -35,7 +38,7 @@ function DashBoard(){
 
     return(
         <div>
-            <h1>Hello from DashBoard (HR Specialist)</h1>
+            <h1>{getEmployeeName(userData!.employeeId)} (HR Specialist)</h1>
             <div>
                 <button className="btn btn-primary" onClick={handleLogOut}>
                     Sign Out

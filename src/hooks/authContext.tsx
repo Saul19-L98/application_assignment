@@ -2,11 +2,16 @@ import {useState,useEffect} from 'react';
 import { ReactNode,useContext as usContextAuth } from "react";
 import { createContext } from "react";
 import { auth,db } from "../firebase.config";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, DocumentData} from "firebase/firestore";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword, UserCredential,onAuthStateChanged,signOut, User } from 'firebase/auth';
 
 type UserType = User | null;
 type LoadingType = boolean;
+
+interface UserData{
+    rol:string;
+    employeeId:string;
+}
 
 interface AuthContextType {
     user: UserType;
@@ -14,7 +19,7 @@ interface AuthContextType {
     signIn: (email: string, password: string) =>  Promise<UserCredential>,
     logging: (email: string, password: string) =>  Promise<UserCredential>,
     logOut: () =>  Promise<void>;
-    getUserRole: (uid: string) => Promise<string | null>;
+    getUserRole: (uid: string) => Promise<UserData | null>;
 };
 
 interface AuthProviderProps{
@@ -57,12 +62,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const logOut = () => signOut(auth);
 
-    const getUserRole = async (uid: string): Promise<string | null> => {
+    const getUserRole = async (uid: string): Promise<UserData | null> => {
         const docRef = doc(db, "users", uid);
         const docSnap = await getDoc(docRef);
-
+        console.log(docSnap.data())
         if (docSnap.exists()) {
-            return docSnap.data().rol || null;
+            return docSnap.data() as UserData;
         } else {
             return null;
         }

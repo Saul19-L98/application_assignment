@@ -19,7 +19,7 @@ interface UserRegister{
 function Register(){
 
     const navigate = useNavigate();
-    const { setUserCredentials } = useUserCredentialsStore();
+    const { setUserCredentials,setUserData } = useUserCredentialsStore();
 
     const [userToRegister,setUserToRegister] =  useState<UserRegister>({
         email:"",
@@ -54,10 +54,11 @@ function Register(){
             else {
                 throw new Error("docRef creation failed");
             }
-            const userRole = await getUserRole(infoUser.user.uid);
-            if (userRole === "employee") {
+            const userObject = await getUserRole(infoUser.user.uid);
+            setUserData(userObject);
+            if (userObject?.rol === "employee") {
                 navigate("/");
-            } else if (userRole === "hrSpecialist") {
+            } else if (userObject?.rol === "hrSpecialist") {
                 navigate("/dashboard");
             } else {
                 throw new Error("Unknown user role");

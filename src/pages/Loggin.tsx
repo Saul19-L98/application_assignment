@@ -11,7 +11,7 @@ interface UserLog{
 
 function Logging(){
 
-    const { setUserCredentials } = useUserCredentialsStore();
+    const { setUserCredentials,setUserData } = useUserCredentialsStore();
     const navigate = useNavigate();
 
     const [userToLog,setUserToLog] =  useState<UserLog>({
@@ -32,10 +32,11 @@ function Logging(){
             const userLogIn = await logging(userToLog.email,userToLog.password);
             if(userLogIn){
                 setUserCredentials(userLogIn);   
-                const userRole = await getUserRole(userLogIn.user.uid);
-                if (userRole === "employee") {
+                const userObject = await getUserRole(userLogIn.user.uid);
+                setUserData(userObject)
+                if (userObject?.rol === "employee") {
                     navigate("/");
-                } else if (userRole === "hrSpecialist") {
+                } else if (userObject?.rol === "hrSpecialist") {
                     navigate("/dashboard");
                 } else {
                     throw new Error("Unknown user role");
