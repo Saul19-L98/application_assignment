@@ -12,7 +12,6 @@ interface ProtectedRouteProps{
 
 function ProtectedRoute({children,isAllowed}:ProtectedRouteProps){
     const { loading } = useContextHook();
-    console.log(isAllowed)
     if(loading) return <Spinner />;
     if(!isAllowed) return <Navigate to="/sign-in"/>
 

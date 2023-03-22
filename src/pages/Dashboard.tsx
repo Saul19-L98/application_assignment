@@ -1,19 +1,14 @@
 import { useContextHook} from "../hooks/authContext";
 import { useApplications, useEmployees } from '../hooks/queryHook';
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
+import {getEmployeeName} from "../helpers/getUserName"
 import ModalForm from "../components/ModalForm";
 import Spinner from "../components/Spinner";
 import Table from "../components/Table";
 
 function DashBoard(){
-    const {setUserCredentials,setEmployees,setApplications,userData, employees} = useUserCredentialsStore();
+    const {setUserCredentials,setEmployees,setApplications,userData,employees} = useUserCredentialsStore();
     const {logOut} = useContextHook();
-
-    // Get Employee's name
-    const getEmployeeName = (employeeId: string) => {
-        const employee = employees?.find((e) => e.employeeId === employeeId);
-        return employee ? employee.fullName : "Unknown";
-    };
 
      // Use the useApplications hook
     const { isLoading: isApplicationsLoading, isError: isApplicationsError, refetch: refetchApplications, } = useApplications();
@@ -23,7 +18,7 @@ function DashBoard(){
 
     //Get first letter of the employee name
     const getFirstLetterOfEmployeeName = () => {
-        const employeeName = getEmployeeName(userData!.employeeId);
+        const employeeName = getEmployeeName(userData!.employeeId,employees!);
         return employeeName.charAt(0).toUpperCase();
     };
 
@@ -55,7 +50,7 @@ function DashBoard(){
                         </div>
                         <div className="flex flex-col ml-2">
                             <div>
-                                <h1>{getEmployeeName(userData!.employeeId)}</h1>
+                                <h1>{getEmployeeName(userData!.employeeId,employees!)}</h1>
                             </div>
                             <div>
                                 <button className="btn btn-primary mt-2 sm:mt-0" onClick={handleLogOut}>

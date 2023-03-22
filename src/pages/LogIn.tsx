@@ -18,7 +18,6 @@ function Logging(){
     const {logging,getUserRole } = useContextHook();
     
     const handleOnChange = ({target:{name,value}}: ChangeEvent<HTMLInputElement>) => {
-        console.log(name,value)
         setUserToLog({...userToLog,[name]:value})
     }
 
@@ -43,6 +42,7 @@ function Logging(){
         catch(error){
             const errorMessage = (error as Error).message;
             toast.error(`${errorMessage}`)
+            console.error(`Error: ${errorMessage}`);
             throw new Error(`Something went wrong: ${errorMessage}`)
         }
     }

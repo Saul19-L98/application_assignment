@@ -25,7 +25,6 @@ function Register(){
     const {signIn,getUserRole} = useContextHook();
     
     const handleOnChange = ({target:{name,value}}: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        console.log(name,value)
         setUserToRegister({...userToRegister,[name]:value})
     }
 
@@ -59,6 +58,7 @@ function Register(){
         }
         catch(error){
             const errorMessage = (error as Error).message;
+            console.error(`Error: ${errorMessage}`);
             toast.error(`${errorMessage}`)
             throw new Error(`Something went wrong: ${errorMessage}`)
         }

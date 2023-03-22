@@ -65,7 +65,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const getUserRole = async (uid: string): Promise<UserData | null> => {
         const docRef = doc(db, "users", uid);
         const docSnap = await getDoc(docRef);
-        console.log(docSnap.data())
         if (docSnap.exists()) {
             return docSnap.data() as UserData;
         } else {
