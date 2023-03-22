@@ -1,29 +1,6 @@
 import {create} from 'zustand';
-import { persist } from "zustand/middleware";
 import {UserCredential} from "firebase/auth";
-
-interface UserData{
-    rol:string;
-    employeeId:string;
-}
-
-interface ApplicationData {
-    applicationId:string;
-    employeeId: string;
-    medicalUnit: string;
-    startDate: string;
-    endDate: string;
-    doctorName: string;
-    medicalDiagnostic: string;
-    coverageDays: number;
-}
-
-interface EmployeesData{
-    employeeId:string;
-    fullName:string;
-    position:string;
-    initialDate:string;
-}
+import {UserData,EmployeesData,ApplicationData} from "../interfaces/sessionTypes"
 
 interface UserCredentialsState {
     userCredentials: UserCredential | null;

@@ -1,25 +1,8 @@
+import {ApplicationData,EmployeesData} from "../interfaces/sessionTypes";
 import { useQuery } from 'react-query';
 import { db } from '../firebase.config';
 import { useUserCredentialsStore } from '../store/userCredentialsStore';
 import { collection, getDocs, DocumentData } from 'firebase/firestore';
-
-interface ApplicationData {
-    applicationId:string;
-    employeeId: string;
-    medicalUnit: string;
-    startDate: string;
-    endDate: string;
-    doctorName: string;
-    medicalDiagnostic: string;
-    coverageDays: number;
-}
-
-interface EmployeesData{
-    employeeId:string;
-    fullName:string;
-    position:string;
-    initialDate:string;
-}
 
 const fetchApplications = async (): Promise<DocumentData[]> => {
     const applicationsRef = collection(db, 'applications');

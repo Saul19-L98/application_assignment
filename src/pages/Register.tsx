@@ -1,3 +1,4 @@
+import {UserRegister} from "../interfaces/sessionTypes"
 import { ChangeEvent, FormEvent, useState } from "react";
 import {useContextHook} from '../hooks/authContext';
 import { db } from "../firebase.config";
@@ -6,15 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import {useUserCredentialsStore} from '../store/userCredentialsStore'
 import { toast } from "react-toastify";
 import { useNavigate,Link } from "react-router-dom";
-
-interface UserRegister{
-    email:string,
-    password:string,
-    rol: string,
-    fullName: string,
-    position:string,
-    initialDate: string,
-}
 
 function Register(){
 

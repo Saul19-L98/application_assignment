@@ -1,13 +1,9 @@
+import { UserLog } from "../interfaces/sessionTypes"
 import { ChangeEvent, FormEvent, useState } from "react";
 import {useContextHook} from '../hooks/authContext';
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
 import { toast } from "react-toastify";
 import { useNavigate,Link } from "react-router-dom";
-
-interface UserLog{
-    email:string,
-    password:string,
-}
 
 function Logging(){
 

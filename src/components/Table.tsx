@@ -1,10 +1,10 @@
 import {useState} from 'react'
-import TableRow from "./TableRow";
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
+import TableRow from "./TableRow";
 
 function Table() {
 
-    const { employees, applications } = useUserCredentialsStore();
+    const { applications,employees } = useUserCredentialsStore();
 
     // Add a state to manage the search term, start date, and end date
     const [searchTerm, setSearchTerm] = useState("");
@@ -22,16 +22,16 @@ function Table() {
         setShowModal(true);
     };
 
-    const clearFilters = () => {
-        setSearchTerm("");
-        setStartDateFilter("");
-        setEndDateFilter("");
-    };
-
     // Get Employee's name
     const getEmployeeName = (employeeId: string) => {
         const employee = employees?.find((e) => e.employeeId === employeeId);
         return employee ? employee.fullName : "Unknown";
+    };
+
+    const clearFilters = () => {
+        setSearchTerm("");
+        setStartDateFilter("");
+        setEndDateFilter("");
     };
 
     // Filter the applications based on the search term, start date, and end date

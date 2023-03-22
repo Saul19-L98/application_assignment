@@ -1,3 +1,4 @@
+import { ApplicationType } from "../interfaces/sessionTypes"
 import {useForm, SubmitHandler,useWatch } from 'react-hook-form';
 import { useUserCredentialsStore } from '../store/userCredentialsStore';
 import { v4 as uuidv4 } from "uuid";
@@ -7,15 +8,6 @@ import { toast } from 'react-toastify';
 
 interface ModalFormProps{
     refetchApplications:()=>void;
-}
-interface ApplicationType {
-    employeeId:string;
-    medicalUnit: string;
-    startDate: string;
-    endDate: string;
-    doctorName: string;
-    medicalDiagnostic: string;
-    coverageDays: number;
 }
 
 function ModalForm({refetchApplications}:ModalFormProps){

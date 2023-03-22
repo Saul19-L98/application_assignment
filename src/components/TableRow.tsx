@@ -17,18 +17,12 @@ interface TableRowProps{
 function TableRow({applicationId,rowNumber,fullName,coverageDays,startDate,endDate,doctorName,medicalDiagnostic,onModalClick}:TableRowProps){
 
     const { removeApplication } = useUserCredentialsStore();
-
-    const handleRowClick = (name:string, diagnostic:string) => {
-        console.log('Name:', name);
-        console.log('Medical Diagnostic:', diagnostic);
-    }
     
     const deleteApplication = async (event:React.MouseEvent, applicationId: string) => {
         event.stopPropagation(); // Add this line to stop event propagation
         try {
             const applicationDoc = doc(db, "applications", applicationId);
             await deleteDoc(applicationDoc);
-            console.log("Application deleted successfully!");
             removeApplication(applicationId); // Remove the application from the global state
             toast.success(`Application of ${fullName} was deleted`);
         } catch (error) {
