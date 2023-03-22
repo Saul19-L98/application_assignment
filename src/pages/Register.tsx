@@ -5,7 +5,7 @@ import {doc,setDoc} from 'firebase/firestore';
 import { v4 as uuidv4 } from "uuid";
 import {useUserCredentialsStore} from '../store/userCredentialsStore'
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 interface UserRegister{
     email:string,
@@ -73,36 +73,55 @@ function Register(){
     }
 
     return(
-        <div>
-            <form onSubmit={handleRegister} className="card card-compact w-96 bg-base-100 shadow-xl">
-                <label htmlFor="email">Email</label> 
-                <input type="email" name="email" placeholder="youremail@company.com" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs"/>
+        <div className="flex items-center justify-center min-h-screen">
+            <form onSubmit={handleRegister} className="card card-compact w-96 bg-base-100 shadow-xl flex flex-col">
+                <h1 className="text-center w-full">Create Account</h1>
+                <div className="flex flex-col w-full px-4 mt-4">
+                    <div className="flex flex-col mb-4">
+                        <label htmlFor="email" className="ml-4">Email</label> 
+                        <input type="email" name="email" placeholder="youremail@company.com" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs self-center"/>
+                    </div>
 
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" placeholder="********" required className="input input-bordered input-secondary w-full max-w-xs" onChange={handleOnChange} />
+                    <div className="flex flex-col mb-4">
+                        <label htmlFor="password" className="ml-4">Password</label>
+                        <input type="password" name="password" placeholder="********" required className="input input-bordered input-secondary w-full max-w-xs self-center" onChange={handleOnChange} />
+                    </div>
 
-                <select defaultValue={"DEFAULT"} name="rol" className="select select-info w-full max-w-xs" onChange={handleOnChange}>
-                    <option value="DEFAULT" disabled>Select Rol</option>
-                    <option value="employee">Employee</option>
-                    <option value="hrSpecialist">HR Specialist</option>
-                </select>
+                    <div className="flex flex-col mb-4">
+                        <select defaultValue={"DEFAULT"} name="rol" className="select select-info w-full max-w-xs self-center" onChange={handleOnChange}>
+                            <option value="DEFAULT" disabled>Select Rol</option>
+                            <option value="employee">Employee</option>
+                            <option value="hrSpecialist">HR Specialist</option>
+                        </select>
+                    </div>
 
-                <label htmlFor="name">Full Name</label> 
-                <input type="text" name="fullName" placeholder="Jhon Williams" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs"/>
+                    <div className="flex flex-col mb-4">
+                        <label htmlFor="name" className="ml-4">Full Name</label> 
+                        <input type="text" name="fullName" placeholder="Jhon Williams" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs self-center"/>
+                    </div>
 
-                <select defaultValue={"DEFAULT"} name="position" className="select select-info w-full max-w-xs" onChange={handleOnChange}>
-                    <option value="DEFAULT" disabled>Select Position</option>
-                    <option value="uiDesigner">UI Designer</option>
-                    <option value="qaEngineering">QA Engineering</option>
-                    <option value="webDeveloper">Web Developer</option>
-                    <option value="analyst">Data Analyst</option>
-                </select>
+                    <div className="flex flex-col mb-4">
+                        <select defaultValue={"DEFAULT"} name="position" className="select select-info w-full max-w-xs self-center" onChange={handleOnChange}>
+                            <option value="DEFAULT" disabled>Select Position</option>
+                            <option value="uiDesigner">UI Designer</option>
+                            <option value="qaEngineering">QA Engineering</option>
+                            <option value="webDeveloper">Web Developer</option>
+                            <option value="analyst">Data Analyst</option>
+                        </select>
+                    </div>
 
-                <label htmlFor="initialDate">Initial Job Assigment Date</label> 
-                <input type="date" name="initialDate" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs"/>
+                    <div className="flex flex-col mb-4">
+                        <label htmlFor="initialDate" className="ml-4">Initial Job Assigment Date</label> 
+                        <input type="date" name="initialDate" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs self-center"/>
+                    </div>
 
-                <div>
-                    <button type="submit" className="btn btn-primary">Register</button>
+                    <Link to="/sign-in" className="text-sm text-blue-600 hover:text-yellow-500 mb-4 text-center">
+                        Already have one.
+                    </Link>
+
+                    <div className="self-center mb-4">
+                        <button type="submit" className="btn btn-primary">Register</button>
+                    </div>
                 </div>
             </form>
         </div>

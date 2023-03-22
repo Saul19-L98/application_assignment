@@ -4,7 +4,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Home from "./pages/Home";
 import DashBoard from "./pages/Dashboard";
 import Register from "./pages/Register";
-import Logging from "./pages/Loggin";
+import LogIn from "./pages/LogIn";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -44,8 +44,8 @@ function App() {
               </ProtectedRoute>
             }/>
           </Route>
-          <Route path="/sign-in" element={<Register />}/>
-          <Route path="/sign-up" element={<Logging />}/>
+          <Route path="/sign-up" element={<Register />}/>
+          <Route path="/sign-in" element={<LogIn />}/>
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </Router>

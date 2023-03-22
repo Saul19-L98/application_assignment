@@ -14,7 +14,7 @@ function ProtectedRoute({children,isAllowed}:ProtectedRouteProps){
     const { loading } = useContextHook();
     console.log(isAllowed)
     if(loading) return <Spinner />;
-    if(!isAllowed) return <Navigate to="/sign-up"/>
+    if(!isAllowed) return <Navigate to="/sign-in"/>
 
     return children ? <>{children}</> : <Outlet />
 }

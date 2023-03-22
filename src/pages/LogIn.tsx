@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import {useContextHook} from '../hooks/authContext';
 import { useUserCredentialsStore } from "../store/userCredentialsStore";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 interface UserLog{
     email:string,
@@ -52,16 +52,41 @@ function Logging(){
     }
 
     return(
-        <div>
+        <div className="min-h-screen flex items-center justify-center">
             <form onSubmit={handleLog} className="card card-compact w-96 bg-base-100 shadow-xl">
-                <label htmlFor="email">Email</label> 
-                <input type="email" name="email" placeholder="youremail@company.com" onChange={handleOnChange} className="input input-bordered input-secondary w-full max-w-xs"/>
+                <div className="flex flex-col items-center">
+                    <h1 className="text-center w-full">Application Assignment</h1>
+                    <div className="flex flex-col w-full px-4 mt-4">
+                        <label htmlFor="email" className="text-left">Email:</label>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="youremail@company.com"
+                            onChange={handleOnChange}
+                            className="input input-bordered input-secondary w-full"
+                        />
+                    </div>
 
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" placeholder="********" required className="input input-bordered input-secondary w-full max-w-xs" onChange={handleOnChange} />
+                    <div className="flex flex-col w-full px-4 mt-4">
+                        <label htmlFor="password" className="text-left">Password:</label>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="********"
+                            required
+                            className="input input-bordered input-secondary w-full"
+                            onChange={handleOnChange}
+                        />
+                    </div>
+                    <Link to="/sign-up" className="text-sm text-blue-600 hover:text-yellow-500 mt-2">
+                        Create Account.
+                    </Link>
 
-                <div>
-                    <button type="submit" className="btn btn-primary">Sign In</button>
+                    <div className="w-full px-4">
+                    <button type="submit" className="btn btn-primary w-full mt-4">
+                        Sign In
+                    </button>
+                    </div>
                 </div>
             </form>
         </div>

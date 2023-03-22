@@ -38,7 +38,10 @@ function TableRow({applicationId,rowNumber,fullName,coverageDays,startDate,endDa
     };
 
     return (
-        <tr onClick={()=>onModalClick(fullName,medicalDiagnostic,coverageDays,startDate,endDate,doctorName)}>
+        <tr 
+            onClick={()=>onModalClick(fullName,medicalDiagnostic,coverageDays,startDate,endDate,doctorName)}
+            className="hover cursor-pointer"
+        >
             <th className="bg-purple-300">{rowNumber}</th> 
             <td>{fullName}</td> 
             <td >{coverageDays}</td> 

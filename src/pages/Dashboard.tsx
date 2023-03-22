@@ -6,7 +6,7 @@ import Spinner from "../components/Spinner";
 import Table from "../components/Table";
 
 function DashBoard(){
-    const {setUserCredentials,userData, employees} = useUserCredentialsStore();
+    const {setUserCredentials,setEmployees,setApplications,userData, employees} = useUserCredentialsStore();
     const {logOut} = useContextHook();
 
     // Get Employee's name
@@ -16,7 +16,7 @@ function DashBoard(){
     };
 
      // Use the useApplications hook
-    const { data: applicationsData, isLoading: isApplicationsLoading, isError: isApplicationsError, error: applicationsError, refetch: refetchApplications, } = useApplications();
+    const { isLoading: isApplicationsLoading, isError: isApplicationsError, refetch: refetchApplications, } = useApplications();
 
     // Use the useEmployees hook
     const { data: employeesData, isLoading: isEmployeesLoading, isError: isEmployeesError, error: employeesError } = useEmployees();
@@ -30,6 +30,8 @@ function DashBoard(){
     const handleLogOut = async () => {
         await logOut();
         setUserCredentials(null);
+        setEmployees(null);
+        setApplications(null);
     }
 
 

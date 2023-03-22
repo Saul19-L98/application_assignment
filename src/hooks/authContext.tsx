@@ -2,7 +2,7 @@ import {useState,useEffect} from 'react';
 import { ReactNode,useContext as usContextAuth } from "react";
 import { createContext } from "react";
 import { auth,db } from "../firebase.config";
-import { getDoc, doc, DocumentData} from "firebase/firestore";
+import { getDoc, doc} from "firebase/firestore";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword, UserCredential,onAuthStateChanged,signOut, User } from 'firebase/auth';
 
 type UserType = User | null;
