@@ -16,11 +16,16 @@ function DashBoard(){
     };
 
      // Use the useApplications hook
-    const { data: applicationsData, isLoading: isApplicationsLoading, isError: isApplicationsError, error: applicationsError } = useApplications();
+    const { data: applicationsData, isLoading: isApplicationsLoading, isError: isApplicationsError, error: applicationsError, refetch: refetchApplications, } = useApplications();
 
     // Use the useEmployees hook
     const { data: employeesData, isLoading: isEmployeesLoading, isError: isEmployeesError, error: employeesError } = useEmployees();
 
+    //Get first letter of the employee name
+    const getFirstLetterOfEmployeeName = () => {
+        const employeeName = getEmployeeName(userData!.employeeId);
+        return employeeName.charAt(0).toUpperCase();
+    };
 
     const handleLogOut = async () => {
         await logOut();
@@ -38,15 +43,32 @@ function DashBoard(){
 
     return(
         <div>
-            <h1>{getEmployeeName(userData!.employeeId)} (HR Specialist)</h1>
-            <div>
-                <button className="btn btn-primary" onClick={handleLogOut}>
-                    Sign Out
-                </button>
-                <label htmlFor="my-modal" className="btn btn-primary">Create Application</label>
-                <input type="checkbox" id="my-modal" className="modal-toggle" />
-                <div className="modal">
-                    <ModalForm />
+            <div className="flex flex-col sm:flex-row justify-between items-center">
+                <div className="card w-full bg-base-100 shadow-xl m-4 md:w-72">
+                    <div className="flex justify-center p-4">
+                        <div className="avatar online placeholder">
+                            <div className="bg-neutral-focus text-neutral-content rounded-full w-20">
+                                <span className="text-xl">{getFirstLetterOfEmployeeName()}</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col ml-2">
+                            <div>
+                                <h1>{getEmployeeName(userData!.employeeId)}</h1>
+                            </div>
+                            <div>
+                                <button className="btn btn-primary mt-2 sm:mt-0" onClick={handleLogOut}>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+                <div className="mb-4 sm:mb-0 sm:mr-4">
+                    <label htmlFor="my-modal" className="btn btn-primary">Create Application</label>
+                    <input type="checkbox" id="my-modal" className="modal-toggle" />
+                    <div className="modal">
+                        <ModalForm refetchApplications={refetchApplications} />
+                    </div>
                 </div>
             </div>
             <div>

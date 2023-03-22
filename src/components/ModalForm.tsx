@@ -5,6 +5,9 @@ import { db } from '../firebase.config';
 import {doc, setDoc,} from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
+interface ModalFormProps{
+    refetchApplications:()=>void;
+}
 interface ApplicationType {
     employeeId:string;
     medicalUnit: string;
@@ -15,7 +18,7 @@ interface ApplicationType {
     coverageDays: number;
 }
 
-function ModalForm(){
+function ModalForm({refetchApplications}:ModalFormProps){
     const initialFormData: ApplicationType = {
         employeeId:"",
         medicalUnit: "",
@@ -38,7 +41,6 @@ function ModalForm(){
     }
 
     const calculateCoverageDays = (startDate: string, endDate: string) => {
-        console.log(startDate,endDate)
         const start = new Date(startDate);
         const end = new Date(endDate);
         const differenceInMilliseconds = end.getTime() - start.getTime();
@@ -70,6 +72,7 @@ function ModalForm(){
                 modalCheckbox.checked = false;
             }
             handleReset();
+            refetchApplications();
             toast.success(`Application created for: ${employeeFullName}`);
         }catch(error){
             toast.error("Something when wrong! 😯");
@@ -77,103 +80,104 @@ function ModalForm(){
         }
     };
     return(
-        <div className="modal-box">
-            <div className="modal-action" onClick={handleReset}>
-                <label htmlFor="my-modal"className="btn">Yay!</label>
+        <div className="modal-box  w-11/12 max-w-5xl">
+            <div className="modal-action m-0" onClick={handleReset}>
+                <label htmlFor="my-modal"className="btn">Close!</label>
             </div>
-            <form onSubmit={handleSubmit(handleSubmitAction)} className="mt-4 mb-4">
-                <div className="mb-4 flex flex-col justify-center">
-                    <div className='mb-4'>
-                    <label htmlFor="medicalUnit" className="block text-whie text-xl font-bold mb-2">Select Employee</label>
-                        <select
-                            className="select select-info w-full max-w-xs"
-                            id="employeeId"
-                            {...register("employeeId",{required:true})}
-                        >
-                            {employees?.map((employee, index) => (
-                                <option key={index} value={employee.employeeId}>
-                                    {employee.fullName}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.employeeId?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
+            <form onSubmit={handleSubmit(handleSubmitAction)} className="">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="mb-4 flex flex-col justify-center">
+                        <div className='mb-4'>
+                            <label htmlFor="medicalUnit" className="block text-white text-xl font-bold mb-2">Select Employee</label>
+                            <select
+                                className="select select-info w-full max-w-xs"
+                                id="employeeId"
+                                {...register("employeeId", { required: true })}
+                            >
+                                {employees?.map((employee, index) => (
+                                    <option key={index} value={employee.employeeId}>
+                                        {employee.fullName}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.employeeId?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
+                        </div>
                     </div>
-                    <label htmlFor="medicalUnit" className="block text-whie text-xl font-bold mb-2">Medical Unit</label>
-                    <div className="flex items-center">
+                    <div>
+                            <label htmlFor="medicalUnit" className="block text-white text-xl font-bold mb-2">Medical Unit</label>
+                            <div className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="isss"
+                                    className="checkbox checkbox-secondary"
+                                    {...register("medicalUnit", { required: true })}
+                                />
+                                <label htmlFor="isss" className="mr-4">ISSS</label>
+                                <input
+                                    type="radio"
+                                    value="minsal"
+                                    className="checkbox checkbox-secondary"
+                                    {...register("medicalUnit", { required: true })}
+                                />
+                                <label htmlFor="minsal" className="mr-4">MINSAL</label>
+                                {errors.medicalUnit?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
+                            </div>
+                        </div>
+                    <div className="mb-4 flex flex-col justify-center">
+                        <label htmlFor="startDate" className="block text-white text-xl font-bold mb-2">Start Date</label>
                         <input
-                        type="radio"
-                        value="isss"
-                        // onChange={handleChange}
-                        className="checkbox checkbox-secondary"
-                        {...register("medicalUnit",{required:true})}
+                            type="date"
+                            id="startDate"
+                            className="input input-bordered input-secondary"
+                            {...register("startDate", { required: true })}
                         />
-                        <label htmlFor="isss" className="mr-4">ISSS</label>
-                        <input
-                        type="radio"
-                        value="minsal"
-                        // onChange={handleChange}
-                        className="checkbox checkbox-secondary"
-                        {...register("medicalUnit",{required:true})}
-                        />
-                        <label htmlFor="minsal" className="mr-4">MINSAL</label>
-                        {errors.medicalUnit?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
+                        {errors.startDate?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                     </div>
-                </div>
-                <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="startDate" className="block text-whie text-xl font-bold mb-2">Start Date</label>
-                    <input
-                        type="date"
-                        id="startDate"
-                        className="input input-bordered input-secondary"
-                        {...register("startDate",{required:true})}
-                    />
-                    {errors.startDate?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
-                </div>
-                <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="endDate" className="block text-whie text-xl font-bold mb-2">End Date</label>
-                    <input
-                        type="date"
-                        id="endDate"
-                        className="input input-bordered input-secondary"
-                        {...register("endDate",{required:true,validate: {
-                            startDateLessThanEndDate: (value) => new Date(startDate) < new Date(value),
-                        },})}
-                    />
-                    {errors.endDate?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
-                    {errors.endDate?.type === 'startDateLessThanEndDate' && (
-                    <span className="text-red-500 text-xs italic">Start date must be less than end date</span>
-                    )}
-                </div>
-                <div className="mb-4 flex flex-col justify-center">
-                    <label htmlFor="doctorName" className="block text-whie text-xl font-bold mb-2">Doctor Name</label>
-                    <input
-                        type="text"
-                        id="doctorName"
-                        className="input input-bordered input-secondary"
-                        {...register("doctorName", {
-                            required: true,
-                        })}
-                    />
+                    <div className="mb-4 flex flex-col justify-center">
+                        <label htmlFor="endDate" className="block text-white text-xl font-bold mb-2">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            className="input input-bordered input-secondary"
+                            {...register("endDate", { required: true, validate: {
+                                startDateLessThanEndDate: (value) => new Date(startDate) < new Date(value),
+                            }, })}
+                        />
+                        {errors.endDate?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
+                        {errors.endDate?.type === 'startDateLessThanEndDate' && (
+                            <span className="text-red-500 text-xs italic">Start date must be less than end date</span>
+                        )}
+                    </div>
+                    <div className="mb-4 flex flex-col justify-center">
+                        <label htmlFor="doctorName" className="block text-white text-xl font-bold mb-2">Doctor Name</label>
+                        <input
+                            type="text"
+                            id="doctorName"
+                            className="input input-bordered input-secondary"
+                            {...register("doctorName", {
+                                required: true,
+                            })}
+                        />
                     {errors.medicalDiagnostic?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                 </div>
                 <div className="mb-4 flex flex-col justify-center">
                     <label htmlFor="medicalDiagnostic" className="block text-white text-xl font-bold mb-2">Medical Diagnostic</label>
                     <textarea
-                    className='textarea textarea-secondary'
-                    id="description"
+                        className="textarea textarea-secondary"
+                        id="description"
                         {...register("medicalDiagnostic", {
                             required: true,
                         })}
                     />
                     {errors.medicalDiagnostic?.type === 'required' && <span className="text-red-500 text-xs italic">This field is required</span>}
                 </div>
-                <div className="mb-4 flex flex-col justify-center">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Submit
-                    </button>
-
-                </div>
-            </form>
+            </div>
+            <div className="flex justify-center">
+                <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Submit
+                </button>
+            </div>
+        </form>
         </div>
     )
 }
