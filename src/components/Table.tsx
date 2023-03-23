@@ -160,7 +160,7 @@ function Table() {
                 modalData={modalData}
                 closeModal={() => setShowModal(false)}
             />
-            {filteredApplications!.length > 0 && (
+            {filteredApplications && filteredApplications!.length > 0 && (
                 <div className="flex justify-center mt-4">
                     <button
                         disabled={currentPage === 1}
