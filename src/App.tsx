@@ -9,22 +9,7 @@ import NotFound from "./pages/NotFound";
 
 function App() {
 
-  // const { getUserRole} = useContextHook();
-
-    const {userCredentials,userData} = useUserCredentialsStore();
-    
-    // const [roleAssigned, setRoleAssigned] = useState<string | null>(null);
-
-    // useEffect(() => {
-    //     const fetchUserRole = async () => {
-    //         if (userCredentials && userCredentials.user) {
-    //             const fetchedUserData = await getUserRole(userCredentials.user.uid);
-    //             setRoleAssigned(fetchedUserData?.rol || null);
-    //         }
-    //     };
-
-    //     fetchUserRole();
-    // }, [userCredentials, getUserRole]);
+  const {userCredentials,userData} = useUserCredentialsStore();
 
   return(
     <>

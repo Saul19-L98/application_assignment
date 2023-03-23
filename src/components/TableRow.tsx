@@ -42,7 +42,7 @@ function TableRow({applicationId,rowNumber,fullName,coverageDays,startDate,endDa
             <td className="hidden md:table-cell">{startDate}</td>
             <td className="hidden md:table-cell">{endDate}</td>
             <td className="hidden lg:table-cell">{doctorName}</td>
-            <td><button onClick={(event) => deleteApplication(event,applicationId)} className="btn btn-active btn-primary">Button</button></td>
+            <td><button onClick={(event) => deleteApplication(event,applicationId)} className="btn btn-active btn-primary">Delete</button></td>
         </tr>
     )
 }
