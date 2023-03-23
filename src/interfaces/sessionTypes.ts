@@ -1,4 +1,4 @@
-//NOTE: To userCredentialsStore.ts
+//NOTE: To userCredentialsStore.ts and authContext
 export interface UserData{
     rol:string;
     employeeId:string;

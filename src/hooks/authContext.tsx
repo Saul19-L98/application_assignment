@@ -1,4 +1,5 @@
-import {useState,useEffect} from 'react';
+import { UserData } from "../interfaces/sessionTypes"
+import { useState,useEffect } from 'react';
 import { ReactNode,useContext as usContextAuth } from "react";
 import { createContext } from "react";
 import { auth,db } from "../firebase.config";
@@ -7,11 +8,6 @@ import { createUserWithEmailAndPassword,signInWithEmailAndPassword, UserCredenti
 
 type UserType = User | null;
 type LoadingType = boolean;
-
-interface UserData{
-    rol:string;
-    employeeId:string;
-}
 
 interface AuthContextType {
     user: UserType;
